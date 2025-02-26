@@ -6,7 +6,7 @@ import {
     deleteFriend,
 } from '../../../controllers/friendController.js';
 
-// /api/users/:userId/friends
+// /api/users/:userId/friends/
 router.route('/')
     .post(addFriend);
 
