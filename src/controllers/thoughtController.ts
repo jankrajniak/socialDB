@@ -45,13 +45,69 @@ export const createThought = async (req: Request, res: Response) => {
 };
 
 export const getThoughtById = async (req: Request, res: Response) => {
-    res.status(200).json({ message: `Will GET thought with ID ${req.params.thoughtId}` });
+    const { thoughtId } = req.params;
+
+    if (!thoughtId) {
+        res.status(400).json({ message: 'Thought ID is required' });
+    } else {
+        try {
+            const thought = await Thought.findById(thoughtId);
+
+            if (!thought) {
+                res.status(404).json({ message: 'No thought found with this ID' });
+            } else {
+                res.status(200).json(thought);
+            }
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    };
 };
 
 export const updateThought = async (req: Request, res: Response) => {
-    res.status(200).json({ message: `Will UPDATE thought with ID ${req.params.thoughtId}` });
+    const { thoughtId } = req.params;
+    const { thoughtText } = req.body;
+
+    if (!thoughtId || !thoughtText) {
+        res.status(400).json({ message: 'Thought ID and text are required' });
+    } else {
+        try {
+            const updatedThought = await Thought.findByIdAndUpdate(
+                thoughtId,
+                { thoughtText },
+                { new: true }
+            );
+
+            if (!updatedThought) {
+                res.status(404).json({ message: 'No thought found with this ID' });
+            } else {
+                res.status(200).json(updatedThought);
+            }
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    };
 };
 
 export const deleteThought = async (req: Request, res: Response) => { 
-    res.status(200).json({ message: `Will DELETE thought with ID ${req.params.thoughtId}`})
+    const { thoughtId } = req.params;
+
+    if (!thoughtId) {
+        res.status(400).json({ message: 'Thought ID is required' });
+    } else {
+        try {
+            const deletedThought = await Thought.findByIdAndDelete(thoughtId);
+
+            if (!deletedThought) {
+                res.status(404).json({ message: 'No thought found with this ID' });
+            } else {
+                    await User.updateOne(
+                    {username: deletedThought.username},
+                    { $pull: { thoughts: thoughtId } },
+                );
+            };
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    };
 };
