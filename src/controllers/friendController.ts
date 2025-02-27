@@ -1,9 +1,47 @@
 import { Response, Request } from 'express';
+import { User } from '../models/index.js';
 
 export const addFriend = async (req: Request, res: Response) => {
-    res.status(200).json({ message: `Will ADD a friend to user ID${req.params.userId}`});
+    const { userId } = req.params;
+    const { friendId } = req.body;
+
+    if (userId === friendId) {
+        res.status(400).json({ message: 'You cannot add yourself as a friend' });
+    } else if (!userId || !friendId) {
+        res.status(400).json({ message: 'Missing required fields' });
+    };
+
+    try {
+        await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { friends: friendId } },
+            { new: true }
+        );
+
+        const updatedUser = await User.findById(userId).populate('friends');
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json(error);
+    }
 };
 
 export const deleteFriend = async (req: Request, res: Response) => {
-    res.status(200).json({ message: `Will delete friend with ID ${req.params.friendId} from user with ID ${req.params.userId}` });
+    const { userId, friendId } = req.params;
+
+    if (!userId || !friendId) {
+        res.status(400).json({ message: 'Missing required fields' });
+    };
+
+    try {
+        await User.findByIdAndUpdate(
+            userId,
+            { $pull: { friends: friendId } },
+            { new: true },
+        )
+
+        const updatedUser = await User.findById(userId).populate('friends');
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json(error);
+    };   
 };
