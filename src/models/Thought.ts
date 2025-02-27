@@ -1,7 +1,6 @@
 import { Schema, Types, model, type Document } from 'mongoose';
 
 interface IThought extends Document {
-    thoughtId: Schema.Types.ObjectId,
     thoughtText: string,
     createdAt: Date,
     username: string,
@@ -42,16 +41,13 @@ const reactionSchema = new Schema<IReaction>(
     {
         toJSON: {
             getters: true,
-        }
+        },
+        _id: false,
     }
 );
 
 const thoughtSchema = new Schema<IThought>(
     {
-        thoughtId: {
-            type: Schema.Types.ObjectId,
-            default: () => new Types.ObjectId(),
-        },
         thoughtText: {
             type: String,
             required: true,
@@ -75,14 +71,14 @@ const thoughtSchema = new Schema<IThought>(
         toJSON: {
             virtuals: true,
             getters: true,
-        }
+        },
     }
 );
 
 thoughtSchema
     .virtual('reactionCount')
     .get(function (this: IThought) {
-        return this.reactions.length;
+        return this.reactions.length > 0 ? this.reactions.length : 0;
     });
 
 const Thought = model('Thought', thoughtSchema);
