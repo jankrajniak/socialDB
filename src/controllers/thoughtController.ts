@@ -101,10 +101,11 @@ export const deleteThought = async (req: Request, res: Response) => {
             if (!deletedThought) {
                 res.status(404).json({ message: 'No thought found with this ID' });
             } else {
-                    await User.updateOne(
-                    {username: deletedThought.username},
-                    { $pull: { thoughts: thoughtId } },
+                await User.updateOne(
+                {username: deletedThought.username},
+                { $pull: { thoughts: thoughtId } },
                 );
+                res.status(200).json({message: 'Thought deleted'});
             };
         } catch (error) {
             res.status(500).json(error);

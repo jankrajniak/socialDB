@@ -81,14 +81,11 @@ try {
     for (const thought of thoughts) {
         try {
             const newThought = await Thought.create(thought);
-            console.log('Thought created:', newThought._id);
-            const updatedUser = await User.findOneAndUpdate(
+            await User.findOneAndUpdate(
                 { username: thought.username },
                 { $addToSet: { thoughts: newThought._id}},
                 { new: true },
             )
-            console.log(updatedUser);
-
         } catch (error) {
             console.error('Error creating thought:', error);
             process.exit(1);
