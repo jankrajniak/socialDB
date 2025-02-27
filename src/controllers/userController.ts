@@ -36,7 +36,33 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request, res: Response) => {
-    res.status(200).json({ message: `Will UPDATE user with id ${req.params.userId}` });
+    const { userId } = req.params;
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+        res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+        const updateFields: any = {};
+        username ? updateFields.username = username : null;
+        email ? updateFields.email = email : null;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateFields },
+            { new: true }
+        )
+
+        if (!updatedUser) {
+            res.status(404).json({ message: 'No user found with this ID' });
+        };
+
+        res.status(200).json(updatedUser);
+        
+    } catch (error) {
+        res.status(500).json(error);
+    };
 };
 
 export const deleteUser = async (req: Request, res: Response) => {

@@ -28,12 +28,27 @@ try {
     const userData = await User.create(users);
     console.log('Users seeded', userData);
 
-    // const getRandomFriends = (userId: String, userList: any[]) => {
-    //     const filteredUsers = userList.filter(user => user._id !== userId);
-    //     const shuffled = filteredUsers.sort(() => 0.5 - Math.random());
-    //     return shuffled.slice(0,2).map(user => user._id);
-    // }
+    try {
+        const friendsAdded1 = await User.findOneAndUpdate(
+            { username: 'testUser1' },
+            { $addToSet: { friends: {
+                $each: [userData[1]._id, userData[2]._id]
+            }}},
+            { new: true},
+        );
 
+        const friendsAdded2 = await User.findOneAndUpdate(
+            { username: 'testUser2' },
+            { $addToSet: { friends: userData[3]._id }},
+            { new: true },
+        );
+
+        console.log('Friends added', friendsAdded1, friendsAdded2);
+    } catch (error) {
+        console.error('Error adding friends:', error);
+        process.exit(1);
+    }
+    process.exit(0);
 } catch (error) {
     console.error('Error seeding data:', error);
     process.exit(1);
