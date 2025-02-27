@@ -39,7 +39,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { username, email } = req.body;
 
-    if (!username || !email) {
+    if (!username && !email) {
         res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -59,7 +59,7 @@ export const updateUser = async (req: Request, res: Response) => {
         };
 
         res.status(200).json(updatedUser);
-        
+
     } catch (error) {
         res.status(500).json(error);
     };

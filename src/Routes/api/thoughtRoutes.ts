@@ -10,7 +10,7 @@ import {
     deleteThought
 } from '../../controllers/thoughtController.js';
 
-// api/thoughts
+// api/thoughts/
 router.route('/')
     .get(getAllThoughts)
     .post(createThought);
